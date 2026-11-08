@@ -22,11 +22,13 @@ TOOLS = Path(__file__).resolve().parent.parent / "tools"
 
 
 def main() -> int:
+    force = "--force" in sys.argv[1:]
     TOOLS.mkdir(parents=True, exist_ok=True)
     target = TOOLS / "ffmpeg.exe"
-    if target.exists() and target.stat().st_size > 1_000_000:
+    if target.exists() and target.stat().st_size > 1_000_000 and not force:
         print(f"ffmpeg уже на месте: {target} "
               f"({target.stat().st_size / 1_048_576:.0f} МБ)")
+        print("перекачать другую сборку: python scripts/get_ffmpeg.py --force")
         return 0
 
     print("загрузка ffmpeg (LGPL, ~167 МБ)…")
