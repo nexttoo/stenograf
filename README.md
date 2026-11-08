@@ -43,6 +43,8 @@
 
 ## Установка
 
+> **Скачать готовый установщик:** [последний релиз](https://github.com/nexttoo/stenograf/releases/latest) — `Stenograf-Setup-1.0.0.exe`, права администратора не нужны.
+
 **Установщик** `Stenograf-Setup-1.0.0.exe` — ставит для текущего пользователя, **без прав администратора**:
 
 - копирует программу в `%LOCALAPPDATA%\Programs\Stenograf`;
