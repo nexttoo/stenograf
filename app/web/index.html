@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Стенограф — локальная диктовка</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="aurora" aria-hidden="true">
+  <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
+</div>
+
+<div class="app">
+  <!-- ─────────────────────────── сайдбар ─────────────────────────── -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#6ee7b7"/><stop offset="1" stop-color="#10b981"/>
+          </linearGradient></defs>
+          <rect x="9" y="2.6" width="6" height="11.4" rx="3" fill="url(#bg)"/>
+          <path d="M6 11.4a6 6 0 0 0 12 0" stroke="url(#bg)" stroke-width="1.9" stroke-linecap="round"/>
+          <path d="M12 17.6V21M9 21h6" stroke="url(#bg)" stroke-width="1.9" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <strong>Стенограф</strong>
+        <small>локальная диктовка</small>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-item is-active" data-page="dictation">
+        <svg viewBox="0 0 24 24"><path d="M12 3.5a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0v-5a3 3 0 0 1 3-3Z"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0"/><path d="M12 18v3"/></svg>
+        <span>Диктовка</span>
+      </button>
+      <button class="nav-item" data-page="files">
+        <svg viewBox="0 0 24 24"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h3l2 2.5h6A2.5 2.5 0 0 1 20 10v7a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 17Z"/><path d="M9 13.5h6"/></svg>
+        <span>Аудио и видео</span>
+        <em class="badge" id="filesBadge" hidden>0</em>
+      </button>
+      <button class="nav-item" data-page="history">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.8V12l3 1.8"/></svg>
+        <span>История</span>
+      </button>
+      <button class="nav-item" data-page="settings">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.1"/><path d="M19.4 14.6a1.6 1.6 0 0 0 .32 1.77l.06.06a1.94 1.94 0 1 1-2.74 2.74l-.06-.06a1.6 1.6 0 0 0-1.77-.32 1.6 1.6 0 0 0-.97 1.46V21a1.94 1.94 0 1 1-3.88 0v-.11a1.6 1.6 0 0 0-1.05-1.46 1.6 1.6 0 0 0-1.77.32l-.06.06a1.94 1.94 0 1 1-2.74-2.74l.06-.06a1.6 1.6 0 0 0 .32-1.77 1.6 1.6 0 0 0-1.46-.97H3a1.94 1.94 0 1 1 0-3.88h.11a1.6 1.6 0 0 0 1.46-1.05 1.6 1.6 0 0 0-.32-1.77l-.06-.06A1.94 1.94 0 1 1 6.93 4.7l.06.06a1.6 1.6 0 0 0 1.77.32H9a1.6 1.6 0 0 0 .97-1.46V3a1.94 1.94 0 1 1 3.88 0v.11a1.6 1.6 0 0 0 .97 1.46 1.6 1.6 0 0 0 1.77-.32l.06-.06a1.94 1.94 0 1 1 2.74 2.74l-.06.06a1.6 1.6 0 0 0-.32 1.77V9c.2.58.75.97 1.46.97H21a1.94 1.94 0 1 1 0 3.88h-.11a1.6 1.6 0 0 0-1.49.75Z"/></svg>
+        <span>Настройки</span>
+      </button>
+      <button class="nav-item" data-page="about">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M12 10.8v5.4"/><path d="M12 7.9h.01"/></svg>
+        <span>О программе</span>
+      </button>
+    </nav>
+
+    <div class="side-foot">
+      <button class="hotkey-pill" id="hotkeyPill" title="Открыть настройки горячей клавиши">
+        <kbd id="hotkeyText">Ctrl + Space</kbd>
+        <small>удерживайте и говорите</small>
+      </button>
+      <div class="side-status">
+        <span class="dot" id="statusDot"></span>
+        <span id="statusText">Загрузка…</span>
+      </div>
+      <div class="side-version">v1.0.0 · офлайн</div>
+    </div>
+  </aside>
+
+  <!-- ─────────────────────────── контент ─────────────────────────── -->
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <h1 id="pageTitle">Диктовка</h1>
+        <p id="pageSub">Говорите — текст появится в активном окне</p>
+      </div>
+      <div class="top-actions">
+        <div class="model-chip" id="modelChip">
+          <span class="dot"></span><span id="modelChipText">GigaAM v3</span>
+        </div>
+        <button class="icon-btn" id="themeToggle" title="Сменить тему">
+          <svg viewBox="0 0 24 24" class="i-moon"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a7.4 7.4 0 1 0 10.2 10.2Z"/></svg>
+          <svg viewBox="0 0 24 24" class="i-sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- ── Диктовка ── -->
+    <section class="page is-active" id="page-dictation">
+      <div class="dictate-grid">
+        <div class="card hero">
+          <div class="hero-inner">
+            <button class="mic" id="micBtn" aria-label="Начать запись">
+              <span class="mic-ring"></span>
+              <span class="mic-ring r2"></span>
+              <span class="mic-core">
+                <svg viewBox="0 0 24 24" class="i-mic"><rect x="9" y="2.8" width="6" height="11.2" rx="3"/><path d="M5.8 11.4a6.2 6.2 0 0 0 12.4 0"/><path d="M12 17.6V21M9.2 21h5.6"/></svg>
+                <svg viewBox="0 0 24 24" class="i-stop"><rect x="8" y="8" width="8" height="8" rx="2"/></svg>
+              </span>
+              <span class="mic-ripple"></span>
+            </button>
+            <div class="hero-state">
+              <strong id="recState">Готово к записи</strong>
+              <span id="recHint">Нажмите на микрофон или удерживайте <kbd>Ctrl + Space</kbd></span>
+            </div>
+            <div class="level" id="levelWrap"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+            <div class="timer" id="recTimer">00:00</div>
+          </div>
+          <div class="hero-stats">
+            <div><b id="stToday">0</b><i>слов сегодня</i></div>
+            <div><b id="stTotal">0</b><i>всего слов</i></div>
+            <div><b id="stSpeed">0</b><i>слов/мин</i></div>
+            <div><b id="stMinutes">0</b><i>минут речи</i></div>
+          </div>
+        </div>
+
+        <div class="side-col">
+          <div class="card mini">
+            <div class="mini-head">
+              <svg viewBox="0 0 24 24" class="ic"><rect x="2.6" y="6.4" width="18.8" height="11.2" rx="2.4"/><path d="M7 9.6h.01M11 9.6h.01M15 9.6h.01M7.6 14h8.8"/></svg>
+              <span>Горячая клавиша</span>
+            </div>
+            <div class="mini-body">
+              <kbd id="hotkeyText2" class="big-kbd">Ctrl + Space</kbd>
+              <div class="seg" id="modeSeg">
+                <button data-mode="hold" class="is-active">Удерживать</button>
+                <button data-mode="toggle">Переключение</button>
+              </div>
+              <p class="mini-note" id="hotkeyNote">Зажмите сочетание, говорите, отпустите — текст вставится сам.</p>
+            </div>
+          </div>
+
+          <div class="card mini">
+            <div class="mini-head">
+              <svg viewBox="0 0 24 24" class="ic"><path d="M4.5 5.5h9l3 3v10h-12Z"/><path d="M8 12h5M8 15h5"/></svg>
+              <span>Вставка текста</span>
+            </div>
+            <div class="mini-body">
+              <select id="selInsert" class="select">
+                <option value="clipboard">Как вставка из буфера</option>
+                <option value="type">Как нажатия клавиш</option>
+                <option value="none">Только в буфер обмена</option>
+              </select>
+              <label class="switch-row">
+                <span>Возвращать прежний буфер</span>
+                <input type="checkbox" id="chkRestore" class="switch">
+              </label>
+              <label class="switch-row">
+                <span>Звуковые сигналы</span>
+                <input type="checkbox" id="chkSounds" class="switch">
+              </label>
+              <label class="switch-row">
+                <span>Индикатор записи на экране</span>
+                <input type="checkbox" id="chkWidget" class="switch">
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card last" id="lastCard">
+        <div class="last-head">
+          <div class="last-title">
+            <svg viewBox="0 0 24 24" class="ic"><path d="M5 4.8h14v10.4l-3.6 3.6H5Z"/><path d="M8.2 9h7.6M8.2 12.4h5"/></svg>
+            <span>Последняя диктовка</span>
+            <em id="lastMeta"></em>
+          </div>
+          <div class="last-actions">
+            <button class="btn ghost sm" id="btnCopyLast" disabled>Копировать</button>
+          </div>
+        </div>
+        <div class="last-text is-empty" id="lastText">Здесь появится распознанный текст.</div>
+      </div>
+    </section>
+
+    <!-- ── Файлы ── -->
+    <section class="page" id="page-files">
+      <div class="card">
+        <div class="drop" id="drop">
+          <input type="file" id="fileInput" multiple accept="audio/*,video/*,.wav,.mp3,.m4a,.ogg,.opus,.flac,.aac,.mp4,.mkv,.mov,.avi,.webm">
+          <div class="drop-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 16.2V4.6M8 8.4l4-3.8 4 3.8"/><path d="M4.6 15.4v2.6A2.4 2.4 0 0 0 7 20.4h10a2.4 2.4 0 0 0 2.4-2.4v-2.6"/></svg>
+          </div>
+          <h3>Перетащите аудио или видео</h3>
+          <p>или <button class="linkbtn" id="btnPick">выберите файлы</button> с компьютера</p>
+          <small class="muted">WAV, MP3, M4A, FLAC, OGG, MP4, MKV, MOV и другие · до 2 ГБ</small>
+        </div>
+        <div class="files-toolbar">
+          <span class="muted" id="jobsSummary">Файлы не выбраны</span>
+          <button class="btn ghost sm" id="btnClearJobs" hidden>Очистить завершённые</button>
+        </div>
+        <div id="jobsList" class="jobs"></div>
+      </div>
+    </section>
+
+    <!-- ── История ── -->
+    <section class="page" id="page-history">
+      <div class="card">
+        <div class="hist-toolbar">
+          <div class="search">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.4"/><path d="m16 16 4 4"/></svg>
+            <input id="histSearch" type="search" placeholder="Поиск по тексту или источнику…">
+          </div>
+          <button class="btn ghost sm" id="btnClearHist">Очистить историю</button>
+        </div>
+        <div id="histList" class="hist"></div>
+      </div>
+    </section>
+
+    <!-- ── Настройки ── -->
+    <section class="page" id="page-settings">
+      <div class="settings-grid">
+        <div class="card">
+          <h3 class="card-title">Микрофон</h3>
+          <p class="card-sub">Устройство, с которого записывается речь.</p>
+          <select id="selMic" class="select wide"></select>
+          <div class="row">
+            <button class="btn ghost" id="btnMicTest">Проверить микрофон</button>
+            <span class="muted" id="micTestHint">Покажет уровень сигнала без записи в историю</span>
+          </div>
+          <div class="level big" id="micLevel"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          <p class="mini-note" style="margin-top:12px">Микрофон остаётся готовым 25 секунд после диктовки — так первая фраза не теряется. Индикатор записи Windows при этом может гореть.</p>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Горячая клавиша</h3>
+          <p class="card-sub">Сочетание для старта и остановки записи.</p>
+          <div class="hotkey-edit">
+            <button class="btn ghost" id="btnHotkey"><span id="hotkeyCapture">Ctrl + Space</span></button>
+            <span class="muted">Нажмите и введите новое сочетание</span>
+          </div>
+          <div class="hint-box" id="hotkeyStatus" hidden></div>
+          <p class="card-sub" style="margin-top:14px">Режим активации</p>
+          <div class="seg wide" id="modeSeg2">
+            <button data-mode="hold">Удерживать</button>
+            <button data-mode="toggle">Переключение</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Вставка и звук</h3>
+          <p class="card-sub">Как распознанный текст попадает в приложения.</p>
+          <select id="selInsert2" class="select wide">
+            <option value="clipboard">Вставка из буфера обмена</option>
+            <option value="type">Симуляция нажатий клавиш</option>
+            <option value="none">Только в буфер обмена</option>
+          </select>
+          <label class="switch-row">
+            <span>Возвращать прежнее содержимое буфера<small>чтобы копирование не затиралось</small></span>
+            <input type="checkbox" id="chkRestore2" class="switch">
+          </label>
+          <label class="switch-row">
+            <span>Звуковые сигналы<small>короткий писк при старте и остановке</small></span>
+            <input type="checkbox" id="chkSounds2" class="switch">
+          </label>
+          <label class="switch-row">
+            <span>Сворачивать в трей при закрытии<small>горячая клавиша продолжит работать</small></span>
+            <input type="checkbox" id="chkTray" class="switch">
+          </label>
+          <label class="switch-row">
+            <span>Плавающий индикатор записи<small>панель поверх всех окон: точка, уровень, таймер</small></span>
+            <input type="checkbox" id="chkWidget2" class="switch">
+          </label>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Модель распознавания</h3>
+          <p class="card-sub">GigaAM v3 с пунктуацией — работает полностью офлайн.</p>
+          <div class="info-list" id="modelInfo"></div>
+          <div class="row" id="modelActions"></div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Данные</h3>
+          <p class="card-sub">История и настройки хранятся рядом с программой.</p>
+          <div class="info-list">
+            <div><span>Папка данных</span><code id="dataPath">—</code></div>
+            <div><span>FFmpeg</span><code id="ffmpegState">—</code></div>
+            <div><span>Версия</span><code id="versionState">—</code></div>
+          </div>
+          <div class="row">
+            <button class="btn ghost" id="btnOpenData">Открыть папку</button>
+            <button class="btn ghost danger" id="btnQuit">Завершить работу</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── О программе ── -->
+    <section class="page" id="page-about">
+      <div class="card about">
+        <div class="about-brand">
+          <div class="about-logo">
+            <img src="logo.jpg" alt="NexTToo Media" width="164" height="164">
+          </div>
+          <h2>Стенограф</h2>
+          <p class="about-tag">Локальная диктовка и расшифровка речи</p>
+          <span class="about-version" id="aboutVersion">версия 1.0.0</span>
+        </div>
+
+        <div class="about-grid">
+          <div><span>Модель</span><strong>GigaAM v3 · пунктуация</strong></div>
+          <div><span>Движок</span><strong>sherpa-onnx · ONNX Runtime</strong></div>
+          <div><span>Режим работы</span><strong>полностью офлайн</strong></div>
+          <div><span>Сеть и аккаунты</span><strong>не требуются</strong></div>
+        </div>
+
+        <div class="about-sep"></div>
+
+        <p class="about-copy">© 2026 — NexTToo Media</p>
+        <p class="about-made">Made by creative support DeepSeek Harness</p>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="toasts" id="toasts"></div>
+
+<div class="boot" id="boot">
+  <div class="boot-card">
+    <div class="boot-spinner"></div>
+    <strong>Подготовка модели…</strong>
+    <span id="bootHint">Загружаем GigaAM v3 в память</span>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

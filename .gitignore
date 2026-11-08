@@ -1,0 +1,32 @@
+# ─── данные и артефакты сборки ───
+dist/
+build/
+installer/payload/
+*.spec
+
+# ─── модель и сторонние бинарники (скачиваются скриптами) ───
+models/
+tools/
+
+# ─── пользовательские данные: диктовки, настройки, логи ───
+data/
+_data_backup/
+*.log
+
+# ─── служебное ───
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# ─── рабочие материалы, не для публикации ───
+_research/
+WhispeRu/
+docs/analysis-whisperu.md
+
+# исходник логотипа (в интерфейсе используется app/web/logo.jpg)
+assets/*.jpg
