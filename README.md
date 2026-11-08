@@ -1,5 +1,13 @@
 # Стенограф
 
+[![Лицензия: MIT](https://img.shields.io/badge/лицензия-MIT-green.svg)](LICENSE)
+![Платформа](https://img.shields.io/badge/платформа-Windows%2010%20%7C%2011-blue)
+![Офлайн](https://img.shields.io/badge/интернет-не%20требуется-brightgreen)
+![Python](https://img.shields.io/badge/python-3.12-3776ab)
+[![Релиз](https://img.shields.io/github/v/release/nexttoo/stenograf)](https://github.com/nexttoo/stenograf/releases)
+
+**Русский** · [English](README.en.md)
+
 **Локальная диктовка и расшифровка аудио/видео на русском языке для Windows.**
 Работает целиком на вашем компьютере: без интернета, без аккаунтов, без телеметрии и без отправки данных на серверы.
 
@@ -55,7 +63,7 @@
 
 Тихий режим: `Stenograf-Setup-1.0.0.exe /VERYSILENT /NORESTART`.
 
-**Портативный вариант**: распакуйте папку `Stenograf` и запустите `Stenograf.exe`. Модель и ffmpeg уже внутри, интернет не нужен.
+**Портативный вариант**: скачайте `Stenograf-1.0.0-portable.zip` из [релизов](https://github.com/nexttoo/stenograf/releases/latest), распакуйте и запустите `Stenograf.exe`. Модель и ffmpeg уже внутри, интернет не нужен.
 
 ---
 

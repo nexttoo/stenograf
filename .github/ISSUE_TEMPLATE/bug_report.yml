@@ -1,0 +1,93 @@
+name: Сообщение об ошибке / Bug report
+description: Что-то работает не так — помогите это исправить
+title: "[Ошибка]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Спасибо за отчёт! Писать можно **по-русски или по-английски**.
+        Перед отправкой загляните в раздел «Если что-то не работает» в README — возможно, ответ уже есть.
+
+  - type: textarea
+    id: what
+    attributes:
+      label: Что произошло
+      description: Опишите фактическое поведение и то, что ожидали увидеть
+      placeholder: Нажал Ctrl+Space, продиктовал фразу, но текст не появился в Word…
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Как воспроизвести
+      placeholder: |
+        1. Открыл Word
+        2. Зажал Ctrl+Space и произнёс фразу
+        3. Отпустил клавишу
+        4. Текст не вставился
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Раздел программы
+      options:
+        - Диктовка (горячая клавиша, запись)
+        - Вставка текста в другое окно
+        - Расшифровка файлов
+        - Индикатор записи
+        - Интерфейс и настройки
+        - Установка / удаление
+        - Другое
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Версия Стенографа
+      description: Видна в разделе «О программе» или в имени установщика
+      placeholder: "1.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: windows
+    attributes:
+      label: Версия Windows
+      placeholder: Windows 11 23H2, x64
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install
+    attributes:
+      label: Как установлена программа
+      options:
+        - Установщик (Setup.exe)
+        - Портативная папка
+        - Запуск из исходников (python app/main.py)
+    validations:
+      required: true
+
+  - type: textarea
+    id: log
+    attributes:
+      label: Журнал работы (если есть)
+      description: |
+        Файл `data/whispercs.log` рядом с программой. Уберите из него личные данные —
+        строки диктовок могут содержать ваш текст.
+      render: text
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Перед отправкой
+      options:
+        - label: Я поискал похожую проблему в Issues
+          required: true
+        - label: Я проверил раздел «Если что-то не работает» в README
+          required: true

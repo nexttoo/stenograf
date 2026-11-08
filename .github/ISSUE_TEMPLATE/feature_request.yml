@@ -1,0 +1,58 @@
+name: Предложение / Feature request
+description: Идея, как сделать Стенограф удобнее
+title: "[Идея]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Приветствуются любые идеи — от мелочей интерфейса до новых сценариев.
+        Писать можно **по-русски или по-английски**.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Какую задачу это решает
+      description: Опишите ситуацию, в которой сейчас неудобно
+      placeholder: Приходится каждый раз вручную…
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Предлагаемое решение
+      description: Как вы это видите
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Область
+      options:
+        - Диктовка
+        - Вставка и форматирование текста
+        - Расшифровка файлов
+        - История и статистика
+        - Интерфейс
+        - Установка и распространение
+        - Другое
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Альтернативы
+      description: Чем вы пользуетесь сейчас или как это решают другие программы
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Перед отправкой
+      options:
+        - label: Я поискал похожую идею в Issues
+          required: true
+        - label: Идея не требует интернета (программа принципиально офлайн)
+          required: true
