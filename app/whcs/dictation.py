@@ -154,11 +154,15 @@ class _INPUT(ctypes.Structure):
     _fields_ = [("type", wt.DWORD), ("u", _INPUTUNION)]
 
 
-def _send_inputs(inputs: list) -> None:
+def _send_inputs(inputs: list) -> int:
+    """Возвращает, сколько событий реально приняла система (0 — ввод заблокирован)."""
     if not IS_WINDOWS or not inputs:
-        return
+        return 0
     arr = (_INPUT * len(inputs))(*inputs)
-    user32.SendInput(len(inputs), ctypes.byref(arr), ctypes.sizeof(_INPUT))
+    try:
+        return int(user32.SendInput(len(inputs), ctypes.byref(arr), ctypes.sizeof(_INPUT)))
+    except Exception:
+        return 0
 
 
 def _key(vk: int, up: bool = False) -> _INPUT:
@@ -235,16 +239,17 @@ def set_clipboard_text(text: str) -> bool:
         user32.CloseClipboard()
 
 
-def paste_from_clipboard() -> bool:
+def paste_from_clipboard() -> int:
     if not IS_WINDOWS:
-        return False
-    _send_inputs([_key(VK_CONTROL), _key(VK_V), _key(VK_V, True), _key(VK_CONTROL, True)])
-    return True
+        return 0
+    return _send_inputs([_key(VK_CONTROL), _key(VK_V), _key(VK_V, True), _key(VK_CONTROL, True)])
 
 
-def type_text(text: str) -> bool:
+def type_text(text: str) -> int:
+    """Печатает текст. Возвращает число принятых событий (0 — ввод заблокирован)."""
     if not IS_WINDOWS:
-        return False
+        return 0
+    total = 0
     batch: list = []
     for ch in text:
         if ch == "\n":
@@ -254,34 +259,43 @@ def type_text(text: str) -> bool:
         else:
             batch.extend(_unicode_char(ch))
         if len(batch) >= 96:
-            _send_inputs(batch)
+            total += _send_inputs(batch)
             batch = []
             time.sleep(0.004)
     if batch:
-        _send_inputs(batch)
-    return True
+        total += _send_inputs(batch)
+    return total
 
 
 def insert_text(text: str, cfg: dict) -> str:
-    """Вставляет текст в активное окно. Возвращает выполненный способ."""
+    """Вставляет текст в активное окно.
+
+    Возвращает способ: clipboard | type | clipboard-ui | blocked | none.
+    blocked означает, что Windows не приняла синтетический ввод (UIPI).
+    """
     if not text:
         return "none"
     mode = cfg.get("insert_mode") or "clipboard"
-
-    if mode == "type":
-        type_text(text)
-        return "type"
 
     if mode == "none":
         set_clipboard_text(text)
         return "clipboard"
 
+    if mode == "type":
+        return "type" if type_text(text) else "blocked"
+
     previous = get_clipboard_text() if cfg.get("restore_clipboard", True) else None
     if not set_clipboard_text(text):
-        type_text(text)
-        return "type"
+        return "type" if type_text(text) else "blocked"
     time.sleep(0.05)
-    paste_from_clipboard()
+    sent = paste_from_clipboard()
+
+    if not sent:
+        # Windows заблокировала Ctrl+V (приложение выше по правам).
+        # Пробуем напечатать; текст в буфере оставляем — пусть не потеряется.
+        if type_text(text):
+            return "type"
+        return "blocked"
 
     if cfg.get("restore_clipboard", True) and not cfg.get("keep_in_clipboard"):
         delay = max(0, int(cfg.get("restore_delay_ms") or 350)) / 1000.0
@@ -579,12 +593,22 @@ class Dictation:
                     else:
                         set_clipboard_text(text)
                         inserted = "clipboard-ui"
+                        _log("окно Стенографа в фокусе — текст только в буфер")
                 self.last_result = {
                     "text": text,
                     "duration": round(dur, 2),
                     "inserted": inserted,
                     "source": source,
                 }
+                if inserted == "blocked":
+                    self.error = (
+                        "Windows заблокировала ввод в активное окно. Обычно так бывает, "
+                        "если приложение-приёмник запущено от имени администратора, либо ввод "
+                        "перехватывает другая программа. Текст сохранён в буфере обмена. "
+                        "Запустите Стенограф от администратора или включите «Симуляция клавиш»."
+                    )
+                    if cfg.get("sound_cues"):
+                        audio.beep("error")
                 if not text:
                     peak = float(abs(samples).max()) if len(samples) else 0.0
                     if peak < 1e-4:

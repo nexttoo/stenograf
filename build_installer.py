@@ -15,7 +15,7 @@ DIST = ROOT / "dist" / "Stenograf"
 INSTALLER = ROOT / "installer"
 PAYLOAD = INSTALLER / "payload"
 SCRIPT = INSTALLER / "Stenograf.iss"
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 
 ISCC_CANDIDATES = [
     Path(r"C:\Program Files (x86)\Inno Setup 6\ISCC.exe"),

@@ -56,6 +56,14 @@ class Window:
         self.on_close = on_close
         self.on_open = on_open
 
+    @property
+    def pid(self) -> int | None:
+        return self.proc.pid if self.proc else None
+
+    def is_alive(self) -> bool:
+        """Окно реально живо? Нужен, чтобы не спутать его с чужим процессом с тем же PID."""
+        return bool(self.proc and self.proc.poll() is None)
+
     def open(self) -> bool:
         exe = find_browser()
         if not exe:
@@ -236,6 +244,7 @@ def main(argv=None) -> int:
         on_close=lambda: _on_window_close(state),
         on_open=lambda pid: setattr(state, "window_pid", pid),
     )
+    state.window = window
     if not args.no_window:
         window.open()
 

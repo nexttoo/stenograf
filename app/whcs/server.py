@@ -220,6 +220,7 @@ class AppState:
         self.downloader = Downloader()
         self.mic_test = False
         self.hotkey = D.KeyboardHook(self._on_key_down, self._on_key_up)
+        self.window = None          # объект Window из main.py
         self.window_pid: int | None = None
         self.dictation = D.Dictation(
             self.engine, lambda: self.cfg, self._on_dictation_done,
@@ -266,14 +267,19 @@ class AppState:
         self.dictation.on_key_down()
 
     def ui_is_foreground(self) -> bool:
-        """Активно ли именно наше окно (а не чужое приложение)."""
-        pid = self.window_pid
-        if not pid:
-            return False
+        """Активно ли именно наше окно (а не чужое приложение).
+
+        Проверяем и живость процесса окна: PID может быть переиспользован
+        другой программой, и тогда текст ошибочно не вставился бы.
+        """
+        win = self.window
         try:
-            return D.foreground_pid() == pid
+            if win is None or not win.is_alive():
+                return False
+            return D.foreground_pid() == win.pid
         except Exception:
             return False
+
     def _on_key_up(self):
         self.dictation.on_key_up()
 
@@ -501,6 +507,30 @@ class Handler(BaseHTTPRequestHandler):
             data = self._body_json()
             st.hotkey.paused = bool(data.get("active"))
             return self._json({"ok": True, "paused": st.hotkey.paused})
+
+        if path == "/api/insert-test":
+            # Проверка вставки: даём время переключиться в Блокнот, затем пробуем
+            # отправить Ctrl+V и, если Windows не приняла, — напечатать символы.
+            data = self._body_json()
+            delay = min(10.0, max(0.0, float(data.get("delay") or 3.0)))
+            text = str(data.get("text") or "Стенограф — проверка вставки.")
+            time.sleep(delay)
+            previous = D.get_clipboard_text() if st.cfg.get("restore_clipboard", True) else None
+            clip_ok = D.set_clipboard_text(text)
+            time.sleep(0.06)
+            paste_events = D.paste_from_clipboard()
+            typed_events = 0
+            if not paste_events:
+                typed_events = D.type_text(text)
+            if not paste_events and not typed_events and previous is not None:
+                D.set_clipboard_text(text)  # ввод заблокирован — оставим текст в буфере
+            return self._json({
+                "ok": True,
+                "clipboard": bool(clip_ok),
+                "paste_events": int(paste_events),
+                "typed_events": int(typed_events),
+                "text": text,
+            })
 
         if path == "/api/dictation/start":
             ok = st.dictation.start("ui")

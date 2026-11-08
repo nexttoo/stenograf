@@ -2,7 +2,7 @@
 ; Установка для текущего пользователя, без прав администратора.
 
 #define AppName "Стенограф"
-#define AppVersion "1.0.0"
+#define AppVersion "1.0.1"
 #define AppPublisher "NexTToo Media"
 #define AppExe "Stenograf.exe"
 #define AppId "{{801A204D-0157-48A2-B472-54AA6121BFE3}"

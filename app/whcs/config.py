@@ -10,7 +10,7 @@ import uuid
 from pathlib import Path
 
 APP_NAME = "Стенограф"
-APP_VERSION = "1.0.0"
+APP_VERSION = "1.0.1"
 
 _lock = threading.RLock()
 

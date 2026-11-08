@@ -573,6 +573,44 @@
     }
   });
 
+  /* ─────────────────────── проверка вставки ─────────────────────── */
+  $("#btnInsertTest").addEventListener("click", async () => {
+    const btn = $("#btnInsertTest");
+    const box = $("#insertTestResult");
+    const hint = $("#insertTestHint");
+    btn.disabled = true;
+    box.hidden = true;
+    let left = 3;
+    hint.textContent = `Переключитесь в Блокнот… ${left}`;
+    const timer = setInterval(() => {
+      left -= 1;
+      if (left > 0) hint.textContent = `Переключитесь в Блокнот… ${left}`;
+    }, 1000);
+    try {
+      const r = await postJSON("/api/insert-test", { delay: 3, text: "Стенограф — проверка вставки." });
+      clearInterval(timer);
+      if (r.paste_events > 0) {
+        box.className = "hint-box";
+        box.textContent = `Windows приняла нажатие Ctrl+V (${r.paste_events} события). Если в Блокноте текст не появился — ввод перехватывает другая программа или защита антивируса.`;
+      } else if (r.typed_events > 0) {
+        box.className = "hint-box";
+        box.textContent = `Вставка из буфера заблокирована, но печать работает (${r.typed_events} событий). Переключите способ вставки на «Симуляция нажатий клавиш» — диктовка заработает.`;
+      } else {
+        box.className = "hint-box bad";
+        box.textContent = "Windows полностью блокирует синтетический ввод (0 событий). Обычно это «защита ввода» антивируса или права администратора. Запустите Стенограф от имени администратора и добавьте его в исключения антивируса.";
+      }
+      box.hidden = false;
+      hint.textContent = "Проверка выполнена";
+    } catch (e) {
+      clearInterval(timer);
+      box.className = "hint-box bad";
+      box.textContent = "Ошибка проверки: " + e.message;
+      box.hidden = false;
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
   /* ─────────────────────────── файлы ─────────────────────────── */
   const drop = $("#drop");
   const fileInput = $("#fileInput");

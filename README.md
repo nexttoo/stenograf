@@ -51,9 +51,9 @@
 
 ## Установка
 
-> **Скачать готовый установщик:** [последний релиз](https://github.com/nexttoo/stenograf/releases/latest) — `Stenograf-Setup-1.0.0.exe`, права администратора не нужны.
+> **Скачать готовый установщик:** [последний релиз](https://github.com/nexttoo/stenograf/releases/latest) — `Stenograf-Setup-1.0.1.exe`, права администратора не нужны.
 
-**Установщик** `Stenograf-Setup-1.0.0.exe` — ставит для текущего пользователя, **без прав администратора**:
+**Установщик** `Stenograf-Setup-1.0.1.exe` — ставит для текущего пользователя, **без прав администратора**:
 
 - копирует программу в `%LOCALAPPDATA%\Programs\Stenograf`;
 - ярлык на рабочем столе;
@@ -61,9 +61,9 @@
 - меню «Пуск»: программа, инструкция, лицензии, удаление;
 - удаление через «Параметры → Приложения», с вопросом о сохранении истории.
 
-Тихий режим: `Stenograf-Setup-1.0.0.exe /VERYSILENT /NORESTART`.
+Тихий режим: `Stenograf-Setup-1.0.1.exe /VERYSILENT /NORESTART`.
 
-**Портативный вариант**: скачайте `Stenograf-1.0.0-portable.zip` из [релизов](https://github.com/nexttoo/stenograf/releases/latest), распакуйте и запустите `Stenograf.exe`. Модель и ffmpeg уже внутри, интернет не нужен.
+**Портативный вариант**: скачайте `Stenograf-1.0.1-portable.zip` из [релизов](https://github.com/nexttoo/stenograf/releases/latest), распакуйте и запустите `Stenograf.exe`. Модель и ffmpeg уже внутри, интернет не нужен.
 
 ---
 

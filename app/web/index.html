@@ -247,6 +247,11 @@
             <option value="type">Симуляция нажатий клавиш</option>
             <option value="none">Только в буфер обмена</option>
           </select>
+          <div class="row">
+            <button class="btn ghost" id="btnInsertTest">Проверить вставку</button>
+            <span class="muted" id="insertTestHint">Переключитесь в Блокнот — через 3 секунды отправим тест</span>
+          </div>
+          <div class="hint-box" id="insertTestResult" hidden></div>
           <label class="switch-row">
             <span>Возвращать прежнее содержимое буфера<small>чтобы копирование не затиралось</small></span>
             <input type="checkbox" id="chkRestore2" class="switch">
