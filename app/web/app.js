@@ -255,6 +255,12 @@
     $("#chkTray").checked = !!c.minimize_to_tray;
     $("#chkWidget").checked = c.widget !== false;
     $("#chkWidget2").checked = c.widget !== false;
+    const autoBox = $("#chkAutostart");
+    if (autoBox) {
+      const supported = state.boot?.autostart_supported !== false;
+      autoBox.checked = !!state.boot?.autostart_active;
+      autoBox.disabled = !supported;
+    }
     $$("#modeSeg button, #modeSeg2 button").forEach((b) =>
       b.classList.toggle("is-active", b.dataset.mode === c.mode)
     );
@@ -292,6 +298,20 @@
     $("#chkSounds").checked = e.target.checked;
   });
   $("#chkTray").addEventListener("change", (e) => saveSettings({ minimize_to_tray: e.target.checked }));
+
+  $("#chkAutostart").addEventListener("change", async (e) => {
+    const want = e.target.checked;
+    try {
+      const r = await postJSON("/api/autostart", { enabled: want });
+      if (!r.ok) throw new Error("не удалось изменить автозапуск");
+      e.target.checked = !!r.active;
+      toast(want ? "Автозапуск включён — при входе в Windows программа стартует в трее"
+                 : "Автозапуск выключен");
+    } catch (err) {
+      e.target.checked = !want;
+      toast(err.message, "error");
+    }
+  });
 
   function syncWidget(on) {
     saveSettings({ widget: on });

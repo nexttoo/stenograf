@@ -16,6 +16,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 from . import asr, audio, config as C, dictation as D
+from . import autostart as AUTOSTART
 from . import overlay as OVL
 
 mimetypes.add_type("text/javascript", ".js")
@@ -419,6 +420,9 @@ class Handler(BaseHTTPRequestHandler):
                 "ffmpeg": C.ffmpeg_path() is not None,
                 "data_dir": str(C.data_dir()),
                 "platform": os.name,
+                "autostart": bool(st.cfg.get("autostart", True)),
+                "autostart_active": AUTOSTART.is_enabled(),
+                "autostart_supported": AUTOSTART.is_supported(),
                 "download": st.downloader.state,
             })
 
@@ -584,6 +588,19 @@ class Handler(BaseHTTPRequestHandler):
             data = self._body_json()
             ok = D.set_clipboard_text(str(data.get("text") or ""))
             return self._json({"ok": ok})
+
+        if path == "/api/autostart":
+            data = self._body_json()
+            enabled = bool(data.get("enabled"))
+            changed = AUTOSTART.enable() if enabled else AUTOSTART.disable()
+            if changed:
+                st.cfg = C.save_config({**st.cfg, "autostart": enabled})
+            return self._json({
+                "ok": changed,
+                "enabled": bool(st.cfg.get("autostart", True)),
+                "active": AUTOSTART.is_enabled(),
+                "supported": AUTOSTART.is_supported(),
+            })
 
         if path == "/api/insert":
             data = self._body_json()

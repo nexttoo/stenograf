@@ -2,7 +2,7 @@
 ; Установка для текущего пользователя, без прав администратора.
 
 #define AppName "Стенограф"
-#define AppVersion "1.0.1"
+#define AppVersion "1.0.2"
 #define AppPublisher "NexTToo Media"
 #define AppExe "Stenograf.exe"
 #define AppId "{{801A204D-0157-48A2-B472-54AA6121BFE3}"
@@ -43,10 +43,15 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "Создать ярлык на рабочем столе"; GroupDescription: "Ярлыки:"; Flags: checkedonce
-Name: "autostart"; Description: "Запускать при входе в Windows (папка «Автозагрузка»)"; GroupDescription: "Дополнительно:"; Flags: checkedonce
+Name: "autostart"; Description: "Запускать при входе в Windows (свёрнутым в трей)"; GroupDescription: "Дополнительно:"; Flags: checkedonce
 
 [Files]
 Source: "payload\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+[Registry]
+; Автозапуск через реестр: так программа стартует с флагом --minimized (без окна),
+; и его можно включать/выключать прямо в настройках приложения.
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "Stenograf"; ValueData: """{app}\{#AppExe}"" --minimized"; Flags: uninsdeletevalue; Tasks: autostart
 
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExe}"; WorkingDir: "{app}"
@@ -54,7 +59,6 @@ Name: "{group}\Удалить {#AppName}"; Filename: "{uninstallexe}"
 Name: "{group}\Инструкция"; Filename: "{app}\README.md"
 Name: "{group}\Лицензии компонентов"; Filename: "{app}\docs\LICENSES.md"
 Name: "{userdesktop}\{#AppName}"; Filename: "{app}\{#AppExe}"; WorkingDir: "{app}"; Tasks: desktopicon
-Name: "{userstartup}\{#AppName}"; Filename: "{app}\{#AppExe}"; WorkingDir: "{app}"; Tasks: autostart
 
 [Run]
 Filename: "{app}\{#AppExe}"; Description: "Запустить {#AppName}"; Flags: nowait postinstall skipifsilent
@@ -63,6 +67,8 @@ Filename: "{app}\{#AppExe}"; Description: "Запустить {#AppName}"; Flags
 Type: filesandordirs; Name: "{app}\data\window-profile"
 Type: filesandordirs; Name: "{app}\data\tmp"
 Type: filesandordirs; Name: "{app}\data\uploads"
+; ярлык из «Автозагрузки», созданный версиями 1.0.0–1.0.1
+Type: files; Name: "{userstartup}\{#AppName}.lnk"
 
 [Code]
 procedure KillApp();

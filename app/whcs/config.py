@@ -10,7 +10,7 @@ import uuid
 from pathlib import Path
 
 APP_NAME = "Стенограф"
-APP_VERSION = "1.0.1"
+APP_VERSION = "1.0.2"
 
 _lock = threading.RLock()
 
@@ -98,6 +98,7 @@ DEFAULTS: dict = {
     "num_threads": 4,
     "save_history": True,
     "minimize_to_tray": True,
+    "autostart": True,           # запуск при входе в Windows, свёрнутым в трей
 }
 
 

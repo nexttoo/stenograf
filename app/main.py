@@ -11,6 +11,7 @@ import time
 import urllib.request
 from pathlib import Path
 
+from whcs import autostart as A
 from whcs import config as C
 from whcs import server as S
 
@@ -213,6 +214,8 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Стенограф")
     ap.add_argument("--no-window", action="store_true")
     ap.add_argument("--no-tray", action="store_true")
+    ap.add_argument("--minimized", action="store_true",
+                    help="запуститься свёрнутым в трей (используется автозапуском)")
     ap.add_argument("--port", type=int, default=0)
     ap.add_argument("--allow-multi", action="store_true")
     args = ap.parse_args(argv)
@@ -236,6 +239,16 @@ def main(argv=None) -> int:
         json.dumps({"port": port, "pid": os.getpid()}), encoding="utf-8"
     )
 
+    # автозапуск: переносим старые ярлыки из «Автозагрузки» на запись в реестре,
+    # в которой есть флаг --minimized (старт без окна, в трей)
+    try:
+        migrated = bool(A.remove_legacy_shortcuts())
+        if migrated and state.cfg.get("autostart") is not False:
+            state.cfg = C.save_config({**state.cfg, "autostart": True})
+        A.ensure(state.cfg.get("autostart", True))
+    except Exception:
+        pass
+
     threading.Thread(target=httpd.serve_forever, daemon=True, name="http").start()
     state.start()
 
@@ -245,7 +258,11 @@ def main(argv=None) -> int:
         on_open=lambda pid: setattr(state, "window_pid", pid),
     )
     state.window = window
-    if not args.no_window:
+
+    # при автозапуске окно не открываем — программа живёт в трее.
+    # если трей недоступен, окно всё-таки нужно: иначе в программу не попасть
+    start_hidden = (args.minimized) and not args.no_tray
+    if not args.no_window and not start_hidden:
         window.open()
 
     def shutdown():

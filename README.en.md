@@ -52,7 +52,7 @@ Drop files onto the **Audio & video** page.
 
 ## Installation
 
-> **Download the ready-made installer:** [latest release](https://github.com/nexttoo/stenograf/releases/latest) — `Stenograf-Setup-1.0.1.exe` (no administrator rights required). A portable `Stenograf-1.0.1-portable.zip` is attached to the same release.
+> **Download the ready-made installer:** [latest release](https://github.com/nexttoo/stenograf/releases/latest) — `Stenograf-Setup-1.0.2.exe` (no administrator rights required). A portable `Stenograf-1.0.2-portable.zip` is attached to the same release.
 
 The installer is **per-user**:
 
@@ -62,7 +62,7 @@ The installer is **per-user**:
 - Start-menu entries: app, readme, licences, uninstall;
 - uninstall through «Settings → Apps», asking whether to keep your history.
 
-Silent mode: `Stenograf-Setup-1.0.1.exe /VERYSILENT /NORESTART`.
+Silent mode: `Stenograf-Setup-1.0.2.exe /VERYSILENT /NORESTART`.
 
 **Portable build**: unzip and run `Stenograf.exe`. The model and ffmpeg are included; no internet needed.
 
